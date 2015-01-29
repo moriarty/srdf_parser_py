@@ -22,19 +22,26 @@ xmlr.reflect(Link, params = [
   ])
 
 class Joint(xmlr.Object):
-  def __init__(self, name = None): #, value = 0.0):
+  def __init__(self, name = None):
     self.name = name
-    #self.value = value
 
 xmlr.reflect(Joint, params = [
-   name_attribute#,
-   #xmlr.Attribute('value', float)
+   name_attribute
   ])
 
 
+class JointVal(xmlr.Object):
+  def __init__(self, name = None, value = 0.0):
+    self.name = name
+    self.value = value
+
+xmlr.reflect(JointVal, params = [
+   name_attribute,
+   xmlr.Attribute('value', float)
+  ])
+
 # Common stuff again
 link_element = xmlr.Element('link', Link, False)
-joint_element = xmlr.Element('joint', Joint, False)
 
 class VirtualJoint(xmlr.Object):
   TYPES = ['unknown', 'fixed', 'floating', 'planar']
@@ -83,7 +90,7 @@ xmlr.reflect(EndEffector, params = [
   name_attribute,
   xmlr.Attribute('group', str),
   xmlr.Attribute('parent_link', str),
-  xmlr.Attribute('parent_group', str)
+  xmlr.Attribute('parent_group', str, False)  
   ])
 
 class PassiveJoint(xmlr.Object):
@@ -103,34 +110,37 @@ class DisableCollisions(xmlr.Object):
 xmlr.reflect(DisableCollisions, params = [
   xmlr.Attribute('link1', str),
   xmlr.Attribute('link2', str),
-  xmlr.Attribute('reason', str)
+  xmlr.Attribute('reason', str, False)
   ])
 
 
 class Group(xmlr.Object):
-  def __init__(self, name = None, link = None, joint = None, chain = None, group = None):
+  def __init__(self, name = None, chain = None):
+    self.aggregate_init()
     self.name = name
-    self.link = link
-    self.joint = joint
+    self.links = []
+    self.joints = []
     self.chain = chain
+    self.groups = []
 
 xmlr.reflect(Group, params = [
   name_attribute,
-  link_element,
-  joint_element,
+  xmlr.AggregateElement('link', Link),
+  xmlr.AggregateElement('joint', Joint),
   xmlr.Element('chain', Chain, False),
-  xmlr.Element('group', Group, False)
+  xmlr.AggregateElement('group', Group)
   ])
 
 class GroupState(xmlr.Object):
-  def __init__(self, name = None, joint = None, group = None):
+  def __init__(self, name = None, group = None):
+    self.aggregate_init()
     self.name = name
-    self.joint = joint
+    self.joints = []
     self.group = group
 
 xmlr.reflect(GroupState, params = [
   name_attribute,
-  joint_element,
+  xmlr.AggregateElement('joint', JointVal),
   xmlr.Attribute('group', str)
   ])
   
@@ -141,12 +151,9 @@ class Robot(xmlr.Object):
     self.name = name
     self.groups = []
     self.group_states = []
-    self.links = []
-    self.joints = []
-    self.chains = []
     self.end_effectors = []
     self.virtual_joints = []
-    self.disabled_collisions = []
+    self.disable_collisionss = []
     self.passive_joints = []
     self.group_map = {}
     self.group_state_map = {}
@@ -174,6 +181,12 @@ class Robot(xmlr.Object):
   
   def add_group(self, group):
     self.add_aggregate('group', group)
+    
+  def add_passive_joint(self, joint):
+    self.add_aggregate('passive_joint', joint)
+  
+  def add_disable_collisions(self, col):
+    self.add_aggregate('disable_collisions', col)
 
   @classmethod
   def from_parameter_server(cls, key = 'robot_description_semantic'):
@@ -194,6 +207,7 @@ xmlr.reflect(Robot, tag = 'robot', params = [
   xmlr.AggregateElement('group_state', GroupState),
   xmlr.AggregateElement('end_effector', EndEffector),
   xmlr.AggregateElement('virtual_joint', VirtualJoint),
+  xmlr.AggregateElement('passive_joint', PassiveJoint),
   xmlr.AggregateElement('disable_collisions', DisableCollisions)
   ])
 
