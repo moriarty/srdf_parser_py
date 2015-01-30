@@ -1,19 +1,20 @@
 <?xml version="1.0"?>
 <package>
   <name>srdf_parser_py</name>
-  <version>0.3.0</version>
-  <description>A temporary pass through to the urdfdom rosdep. You should depend on liburdfdom-dev directly.</description>
-  <maintainer email="hsu@osrfoundation.org">John Hsu</maintainer>
-  <maintainer email="isucan@google.com">Ioan Sucan</maintainer>
+  <version>0.1.0</version>
+  <description>A srdf parser for python, derived from the urdf_parser_py</description>
+  <maintainer email="gwalck@techfak.uni-bielefeld.de">Guillaume Walck</maintainer>
 
   <license>BSD</license>
 
   <author>Wim Meeussen</author>
   <author>John Hsu</author>
   <author>Ioan Sucan</author>
-  <url type="website">http://ros.org/wiki/urdf</url>
-  <url type="bugtracker">https://github.com/ros/urdfdom/issues</url>
-  <url type="repository">https://github.com/ros/urdfdom</url>
+  <author>Guillaume Walck</author>
+  <url type="website">http://ros.org/wiki/srdf</url>
+  <url type="bugtracker">https://github.com/ros/srdfdom/issues</url>
+  <url type="repository">https://github.com/ros/srdfdom</url>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rostest</build_depend>
 </package>
