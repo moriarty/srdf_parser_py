@@ -7,10 +7,8 @@ from srdf_parser_py.srdf import SRDF
 from xml.dom.minidom import parseString
 import xml.dom
 
-# some code re-use from test_xacro.py  
+# xml match code from test_xacro.py  
 # by Stuart Glaser and William Woodall
-
-
 
 def first_child_element(elt):
   c = elt.firstChild
@@ -85,10 +83,9 @@ def xml_matches(a, b):
     print('=' * 78)
     b.writexml(sys.stdout)
     return False
-  #print ("element match")
   return True
   
-## A sample python unit test
+## A python unit test for srdf
 class TestSRDFParser(unittest.TestCase):
     ## test valid srdf
 

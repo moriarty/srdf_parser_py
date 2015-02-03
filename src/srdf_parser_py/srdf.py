@@ -1,5 +1,5 @@
-from srdf_parser_py.xml_reflection.basics import *
-import srdf_parser_py.xml_reflection as xmlr
+from urdf_parser_py.xml_reflection.basics import *
+import urdf_parser_py.xml_reflection as xmlr
 
 # Add a 'namespace' for names so that things don't conflict between SRDF and SDF?
 # A type registry? How to scope that? Just make a 'global' type pointer?
@@ -38,6 +38,16 @@ class JointVal(xmlr.Object):
 xmlr.reflect(JointVal, params = [
    name_attribute,
    xmlr.Attribute('value', float)
+  ])
+
+class Sphere(xmlr.Object):
+  def __init__(self, center = None, radius = 0.0):
+    self.center = center
+    self.radius = radius
+
+xmlr.reflect(Sphere, params = [
+   xmlr.Attribute('center', str),
+   xmlr.Attribute('radius', float)
   ])
 
 # Common stuff again
@@ -144,6 +154,18 @@ xmlr.reflect(GroupState, params = [
   xmlr.Attribute('group', str)
   ])
   
+  
+class LinkSphereApproximation(xmlr.Object):
+  def __init__(self, link = None):
+    self.aggregate_init()
+    self.link = link
+    self.spheres = []
+
+xmlr.reflect(LinkSphereApproximation, params = [
+  xmlr.Attribute('link', str),
+  xmlr.AggregateElement('sphere', Sphere)
+  ])
+  
 class Robot(xmlr.Object):
   def __init__(self, name = None):
     self.aggregate_init()
@@ -155,10 +177,9 @@ class Robot(xmlr.Object):
     self.virtual_joints = []
     self.disable_collisionss = []
     self.passive_joints = []
+    self.link_sphere_approximations = []
     self.group_map = {}
     self.group_state_map = {}
-    self.parent_map = {}
-    self.child_map = {}
     
   def add_aggregate(self, typeName, elem):
     xmlr.Object.add_aggregate(self, typeName, elem)
@@ -187,6 +208,10 @@ class Robot(xmlr.Object):
   
   def add_disable_collisions(self, col):
     self.add_aggregate('disable_collisions', col)
+  
+  def add_link_sphere_approximation(self, link):
+    self.add_aggregate('link_sphere_approximation', link)
+      
 
   @classmethod
   def from_parameter_server(cls, key = 'robot_description_semantic'):
@@ -208,7 +233,8 @@ xmlr.reflect(Robot, tag = 'robot', params = [
   xmlr.AggregateElement('end_effector', EndEffector),
   xmlr.AggregateElement('virtual_joint', VirtualJoint),
   xmlr.AggregateElement('passive_joint', PassiveJoint),
-  xmlr.AggregateElement('disable_collisions', DisableCollisions)
+  xmlr.AggregateElement('disable_collisions', DisableCollisions),
+  xmlr.AggregateElement('link_sphere_approximation', LinkSphereApproximation)
   ])
 
 # Make an alias
